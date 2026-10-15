@@ -9,7 +9,6 @@ from modules.data_processing import split_profile_data, create_vector_database, 
 from modules.query_engine import generate_initial_facts, answer_user_query
 import config
 
-# Set up logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -29,31 +28,25 @@ def process_linkedin(linkedin_url, api_key=None, mock=False):
         mock: If True, loads mock data from a premade JSON file instead of using the API.
     """
     try:
-        # Extract the profile data
         profile_data = extract_linkedin_profile(linkedin_url, api_key, mock=mock)
         if not profile_data:
             logger.error("Failed to retrieve profile data.")
             return
 
-        # Split the data into nodes
         nodes = split_profile_data(profile_data)
 
-        # Store in vector database
         vectordb_index = create_vector_database(nodes)
         if not vectordb_index:
             logger.error("Failed to create vector database.")
             return
 
-        # Verify embeddings
         if not verify_embeddings(vectordb_index):
             logger.warning("Some embeddings may be missing or invalid.")
 
-        # Generate and display the initial facts
         initial_facts = generate_initial_facts(vectordb_index)
         print("\nHere are 3 interesting facts about this person:")
         print(initial_facts)
 
-        # Start the chatbot interface
         chatbot_interface(vectordb_index)
     except Exception as e:
         logger.error(f"Error occurred: {str(e)}")

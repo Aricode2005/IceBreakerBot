@@ -1,5 +1,4 @@
 """Module for processing LinkedIn profile data."""
-
 import json
 import logging
 from typing import Dict, List, Any, Optional
@@ -21,11 +20,8 @@ def split_profile_data(profile_data: Dict[str, Any]) -> List:
         List of document nodes.
     """
     try:
-        # Convert the profile data to a JSON string
         profile_json = json.dumps(profile_data)
-        # Create a Document object from the JSON string
         document = Document(text=profile_json)
-        # Split the document into nodes using SentenceSplitter
         splitter = SentenceSplitter(chunk_size=config.CHUNK_SIZE)
         nodes = splitter.get_nodes_from_documents([document])
         logger.info(f"Created {len(nodes)} nodes from profile data")
@@ -45,9 +41,7 @@ def create_vector_database(nodes: List) -> Optional[VectorStoreIndex]:
         VectorStoreIndex or None if indexing fails.
     """
     try:
-        # Get the embedding model
         embedding_model = create_watsonx_embedding()
-        # Create a VectorStoreIndex from the nodes
         index = VectorStoreIndex(
             nodes=nodes,
             embed_model=embedding_model,
